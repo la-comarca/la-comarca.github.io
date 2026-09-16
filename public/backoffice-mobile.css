@@ -1,0 +1,181 @@
+/* Mobile QA layer — mirrors the public La Comarca shell, then optimizes every back-office workflow for touch. */
+
+/* Top actions should read as actions, not decorative links. */
+.bo-page-actions{gap:10px;flex-wrap:nowrap;padding-bottom:0}
+.bo-page-actions .bo-button{min-width:128px;min-height:44px!important;justify-content:center;white-space:nowrap}
+.bo-site-header .bo-account-menu>summary{min-height:44px;align-items:center}
+
+@media(max-width:1050px) and (min-width:761px){
+  .bo-site-header.header{margin-inline:3%;gap:18px}
+  .bo-site-header .bo-desktop-nav{gap:18px}
+  .bo-site-header .bo-desktop-nav button{font-size:.78rem}
+  .bo-site-header .bo-account-menu>summary{max-width:180px;font-size:.78rem}
+  .bo-page-head{padding-inline:3%}
+  .bo-content{padding-inline:3%}
+}
+
+@media(max-width:760px){
+  /* Match the public mobile shell: light brand header + blue rounded dock. */
+  .bo-body{padding-bottom:calc(84px + env(safe-area-inset-bottom));overflow-x:hidden}
+  .bo-site-header{display:none!important}
+  .bo-mobile-top{position:sticky;top:0;z-index:60;height:64px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);box-shadow:none}
+  .bo-mobile-brand.bo-brand-lockup{display:inline-flex;align-items:center;gap:10px;min-height:44px;min-width:0;color:var(--ink);text-decoration:none}
+  .bo-mobile-brand .brand-lighthouse{display:block;width:32px;height:32px;flex:0 0 auto}
+  .bo-mobile-brand .brand-name{font:700 .82rem/1 'DM Sans',sans-serif;letter-spacing:.04em;white-space:nowrap;color:var(--ink)}
+  .bo-mobile-context{display:none!important}
+  .bo-avatar{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0;border:1px solid var(--blue);border-radius:50%;background:transparent;color:var(--blue);font:600 .68rem/1 'DM Sans',sans-serif;letter-spacing:.02em}
+  .bo-avatar:active{background:var(--blue);color:#fff}
+
+  .bo-bottom-nav{position:fixed;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;left:0;right:0;bottom:0;z-index:70;height:auto;min-height:66px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:rgba(19,59,88,.97);color:#fff;border:0;border-radius:18px 18px 0 0;box-shadow:0 -8px 28px rgba(6,23,36,.2)}
+  .bo-bottom-nav button{display:flex;min-width:0;min-height:50px;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;border:0;border-radius:12px;background:transparent!important;color:#c9dbe4;font-size:.68rem;line-height:1.1;transition:background .2s,color .2s,transform .2s}
+  .bo-bottom-nav button:before{content:none!important}
+  .bo-bottom-nav button small{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.58rem;font-weight:500;line-height:1.1}
+  .bo-bottom-nav .dock-icon{width:21px;height:21px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.7;transition:transform .2s ease}
+  .bo-bottom-nav button.active,.bo-bottom-nav button[aria-current=page]{background:#2b6588!important;color:#fff;transform:translateY(-2px)}
+  .bo-bottom-nav button.active .dock-icon,.bo-bottom-nav button[aria-current=page] .dock-icon{transform:scale(1.08)}
+  .bo-bottom-nav button:focus-visible{outline:2px solid #fff;outline-offset:-3px}
+
+  /* Page intros: title first, actions below. Never squeeze CTAs next to a large heading. */
+  .bo-main{min-height:calc(100dvh - 64px)}
+  .bo-page-head{display:block;min-height:0;padding:30px 5% 26px;border-bottom:1px solid var(--line)}
+  .bo-page-head>div:first-child{min-width:0}
+  .bo-page-head h1{font-size:clamp(3.65rem,16.5vw,4.85rem);line-height:.9;overflow-wrap:anywhere}
+  .bo-page-head .bo-eyebrow{margin-bottom:10px}
+  .bo-page-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;margin-top:22px;padding:0}
+  .bo-page-actions:empty{display:none}
+  .bo-page-actions:has(.bo-button:only-child){grid-template-columns:1fr}
+  .bo-page-actions .bo-button{width:100%;min-width:0;min-height:48px!important;padding:12px 13px!important;justify-content:center;gap:10px;font-size:.72rem!important}
+  .bo-button{min-height:48px!important}
+  .bo-button.primary,.bo-button.secondary{justify-content:center}
+  .bo-content{padding:26px 5% 46px;max-width:none}
+
+  /* Today / overview. */
+  .bo-hero{display:block;margin:0 0 48px;border-top:1px solid var(--ink)}
+  .bo-hero-main{min-height:0;padding:26px 0 30px}
+  .bo-hero-main h2{font-size:clamp(3rem,13vw,3.75rem);line-height:.98;margin:16px 0 18px;overflow-wrap:anywhere}
+  .bo-hero-main p{font-size:.82rem;line-height:1.65}
+  .bo-hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:24px}
+  .bo-hero-actions .bo-button{width:100%;min-width:0;justify-content:center;padding-inline:12px!important}
+  .bo-metric-stack{grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+  .bo-metric{min-width:0;min-height:112px;padding:19px 12px 17px 0;border-right:0;border-bottom:1px solid var(--line)}
+  .bo-metric:nth-child(odd){border-right:1px solid var(--line)}
+  .bo-metric:nth-child(even){padding-left:12px}
+  .bo-metric small{font-size:.53rem}
+  .bo-metric strong{font-size:2.65rem;margin:16px 0 5px}
+  .bo-metric span{font-size:.62rem}
+  .bo-section{margin-top:44px}
+  .bo-section-head{display:block;margin-bottom:16px}
+  .bo-section-head h2{font-size:2.65rem}
+  .bo-section-head p{font-size:.75rem;margin-top:8px}
+
+  /* Lists and record rows: finger targets, no hover-only meaning. */
+  .bo-grid,.bo-groups{grid-template-columns:1fr;gap:0;border-top:1px solid var(--ink)}
+  .bo-card,.bo-group-card,.bo-person-card,.bo-session-card,.bo-more-card{touch-action:manipulation}
+  .bo-card{min-height:0;padding:22px 0}
+  .bo-card-title strong{font-size:1.15rem}
+  .bo-card-title>span,.bo-group-card-head>span,.bo-person-card>span{min-width:32px;min-height:32px;display:grid;place-items:center}
+  .bo-card-meta{margin-top:17px}
+  .bo-card-meta div{font-size:.68rem}
+  .bo-session-card{grid-template-columns:70px minmax(0,1fr) 38px;gap:13px;min-height:96px;padding:16px 0}
+  .bo-session-time strong{font-size:2.18rem}
+  .bo-session-info{min-width:0}
+  .bo-session-info strong{font-size:1rem;overflow-wrap:anywhere}
+  .bo-session-info p{font-size:.65rem;line-height:1.4}
+  .bo-session-card>span{width:36px;height:36px}
+  .bo-group-card{min-height:0;padding:26px 0}
+  .bo-group-card h3{font-size:1.9rem;overflow-wrap:anywhere}
+  .bo-group-card p{font-size:.73rem;line-height:1.5}
+  .bo-group-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:25px;padding-top:14px}
+  .bo-group-stats div{min-width:0;padding-right:10px}
+  .bo-group-stats div+div{padding-left:10px;border-left:1px solid var(--line)}
+  .bo-group-stats strong{font-size:1.45rem;overflow:hidden;text-overflow:ellipsis}
+  .bo-person-card{grid-template-columns:40px minmax(0,1fr) 36px;gap:12px;min-height:78px;padding:14px 0}
+  .bo-person-copy{min-width:0}.bo-person-copy strong{font-size:.91rem;overflow-wrap:anywhere}.bo-person-copy small{font-size:.63rem;line-height:1.45}
+  .bo-search{min-height:48px;margin-bottom:22px}
+  .bo-search input{font-size:.82rem}
+
+  /* Classroom detail: horizontally scrollable tabs that stay reachable. */
+  .bo-detail-head{display:block;margin-bottom:18px;padding-bottom:20px}
+  .bo-detail-head h2{font-size:3rem;overflow-wrap:anywhere}
+  .bo-detail-head p{font-size:.74rem;line-height:1.6}
+  .bo-tabs{position:sticky;top:64px;z-index:25;gap:22px;margin:0 -5% 24px;padding:0 5%;background:color-mix(in srgb,var(--paper) 96%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);scroll-snap-type:x proximity}
+  .bo-tabs button{min-height:48px;padding:13px 0 11px;font-size:.69rem;scroll-snap-align:start}
+  .bo-record-grid{grid-template-columns:1fr}
+  .bo-record-item{min-height:72px;padding:16px 0}
+  .bo-progress-row{padding:16px 0}
+
+  /* Calendar: keep controls thumb-sized and rows scan-friendly. */
+  .bo-calendar-toolbar{align-items:center;gap:14px;margin-bottom:8px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+  .bo-calendar-toolbar h2{font-size:2.45rem;line-height:1;min-width:0;overflow-wrap:anywhere}
+  .bo-calendar-toolbar>div{display:flex;gap:6px;flex:0 0 auto}
+  .bo-calendar-toolbar button{width:44px;height:44px;min-width:44px;border-color:var(--line)}
+  .bo-calendar-day>header{padding:18px 0 10px}
+  .bo-calendar-day>header h3{font-size:.82rem}
+  .bo-calendar-event{grid-template-columns:60px minmax(0,1fr) 44px;gap:10px;min-height:76px;padding:12px 0}
+  .bo-calendar-event time{font-size:1.35rem}.bo-calendar-event strong{font-size:.82rem;overflow-wrap:anywhere}.bo-calendar-event p{font-size:.61rem}.bo-calendar-event button{width:44px;height:44px}
+
+  /* Config and “More” retain editorial hierarchy without oversized mobile type. */
+  .bo-more-grid{grid-template-columns:1fr;gap:0}
+  .bo-more-card{min-height:0;padding:22px 0}
+  .bo-setup{border-top:0}
+  .bo-setup-intro{padding:4px 0 34px;gap:18px}
+  .bo-setup-intro h2,.bo-setup-block h2,.bo-setup-next h2{font-size:clamp(2.55rem,12vw,3.05rem);line-height:1}
+  .bo-setup-intro>p,.bo-setup-copy p,.bo-setup-next p{font-size:.78rem;line-height:1.6}
+  .bo-setup-intro>ol{grid-template-columns:1fr 1fr;margin-top:22px}
+  .bo-setup-intro li{min-height:82px;padding:14px 9px 12px 0;gap:12px;font-size:.85rem}
+  .bo-setup-intro li+li{padding-left:9px}
+  .bo-setup-block{padding:34px 0 38px;gap:22px}
+  .bo-setup-copy p{margin:14px 0 18px}
+  .bo-setup-add,.bo-setup-next>button:not(.bo-button){display:flex;width:100%;min-height:48px;align-items:center;padding:12px 14px;justify-content:space-between}
+  .bo-setup-row{min-height:76px;padding:15px 0;gap:15px}
+  .bo-setup-row strong{font-size:.92rem}.bo-setup-row small{font-size:.65rem}.bo-setup-row>span:last-child{font-size:.65rem}
+  .bo-setup-next{padding:36px 0 8px}.bo-setup-next>button+button{margin:8px 0 0!important}
+  .bo-access-entry{margin-top:36px;padding-top:28px}.bo-access-entry h3{font-size:2.5rem}.bo-access-entry .bo-button{width:100%}
+
+  /* All editors become real mobile bottom sheets with sticky actions. */
+  .bo-sheet,.bo-setup-dialog,.bo-access-dialog{width:100%;max-width:none;height:94dvh;max-height:94dvh;margin:auto 0 0;border:0;border-radius:18px 18px 0 0;background:var(--paper);overflow:hidden}
+  .bo-sheet-card{height:100%;min-height:0;display:flex;flex-direction:column}
+  .bo-sheet-card>header,.bo-setup-dialog form>header,.bo-access-shell>header{position:sticky;top:0;z-index:4;background:var(--paper);padding:24px 5% 19px;border-bottom:1px solid var(--line)}
+  .bo-sheet-card h2{font-size:2.85rem;margin-top:9px}.bo-setup-dialog h2{font-size:2.8rem}.bo-access-shell>header h2{font-size:3rem}
+  .bo-sheet-card header button,.bo-setup-dialog header button,.bo-access-shell>header button{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0}
+  .bo-sheet-body,.bo-setup-form-body{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:22px 5% 28px;gap:20px}
+  .bo-field input,.bo-field select,.bo-field textarea,.bo-setup-dialog .bo-field input,.bo-setup-dialog .bo-field select,.bo-setup-dialog .bo-field textarea{min-height:48px;font-size:.88rem}
+  .bo-field textarea,.bo-setup-dialog .bo-field textarea{min-height:118px}
+  .bo-sheet-status,.bo-setup-form-status{padding:0 5%;font-size:.69rem}
+  .bo-sheet-card>footer,.bo-setup-dialog form>footer{position:sticky;bottom:0;z-index:4;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 5% calc(14px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--paper) 96%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+  .bo-sheet-card>footer .bo-button,.bo-setup-dialog form>footer .bo-button{width:100%;justify-content:center}
+
+  /* Access manager is a full workflow, not a desktop table squeezed down. */
+  .bo-access-shell{height:100%;overflow:auto;-webkit-overflow-scrolling:touch}
+  .bo-access-shell>header p{font-size:.75rem;line-height:1.55}
+  .bo-access-invite{grid-template-columns:1fr;gap:18px;padding:24px 5% 28px}
+  .bo-access-invite h3,.bo-access-list-head h3{font-size:1.45rem}
+  .bo-access-invite form{grid-template-columns:1fr;gap:16px}.bo-access-invite form>*{grid-column:1!important}.bo-access-invite .bo-button{width:100%}
+  .bo-access-list{padding:26px 5% 42px}
+  .bo-access-list-head{padding-bottom:16px}
+  .bo-access-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 14px;min-height:0;padding:18px 0}
+  .bo-access-person{min-width:0}.bo-access-person strong{font-size:.88rem;overflow-wrap:anywhere}.bo-access-person small{font-size:.63rem;overflow-wrap:anywhere}
+  .bo-access-status{justify-self:end;font-size:.55rem}
+  .bo-access-row label{grid-column:1/-1;min-width:0}.bo-access-row select{min-height:44px;font-size:.72rem}
+  .bo-access-row .bo-button{grid-column:1/-1;width:100%;justify-content:center}
+  .bo-access-toggle{min-height:44px}
+
+  .bo-toast{left:5%;right:5%;bottom:calc(86px + env(safe-area-inset-bottom));padding:13px 15px;font-size:.69rem}
+
+  /* Touch devices: never depend on desktop hover motion. */
+  .bo-card:hover,.bo-group-card:hover,.bo-person-card:hover,.bo-session-card:hover,.bo-more-card:hover,.bo-setup-row:hover{padding-left:0;padding-right:0;background:transparent}
+}
+
+@media(max-width:390px){
+  .bo-mobile-brand .brand-name{font-size:.74rem}
+  .bo-page-head h1{font-size:3.45rem}
+  .bo-page-actions,.bo-hero-actions{grid-template-columns:1fr}
+  .bo-group-stats{grid-template-columns:1fr 1fr 1fr}
+  .bo-bottom-nav{gap:3px;padding-inline:6px}
+  .bo-bottom-nav button{padding-inline:1px}.bo-bottom-nav button small{font-size:.53rem}.bo-bottom-nav .dock-icon{width:19px;height:19px}
+  .bo-sheet-card>footer,.bo-setup-dialog form>footer{grid-template-columns:1fr}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .bo-bottom-nav button,.bo-bottom-nav .dock-icon{transition:none!important}
+}
