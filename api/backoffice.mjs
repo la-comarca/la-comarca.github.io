@@ -149,7 +149,7 @@ export async function backoffice(request,env,fetcher=fetch,dependencies={}){
  const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
  try{
   if(path==='/backoffice/api/me'&&request.method==='GET')return reply(origin,200,{user:{name:me.name,email:me.email,role:(me.modules||[]).find(m=>m.key==='catecismo')?.role||'reader'},module:'catecismo'});
-  if(path==='/backoffice/api/schema'&&request.method==='GET')return reply(origin,200,{modules:CATECHISM_KEYS.map(key=>({key,label:modules[key].label,canWrite:can(user,'catecismo',true),fields:modules[key].fields.filter(field=>field.name!=='Necesita ride')}))});
+  if(path==='/backoffice/api/schema'&&request.method==='GET')return reply(origin,200,{modules:CATECHISM_KEYS.map(key=>({key,label:modules[key].label,canWrite:can(user,'catecismo',true),fields:modules[key].fields.filter(field=>field.name!=='Necesita ride').map(field=>({...field,readOnly:!!field.readOnly||!!field.target&&!can(user,modulePermission(field.target))}))}))});
   if(path==='/backoffice/api/summary'&&request.method==='GET')return reply(origin,200,{summary:await summary(env,fetcher)});
   if(path==='/backoffice/api/sessions'&&request.method==='GET')return reply(origin,200,await sessions(env,fetcher));
   if(path==='/backoffice/api/attendance'&&request.method==='GET')return reply(origin,200,await attendanceSheet(env,user,url.searchParams.get('session'),fetcher));
