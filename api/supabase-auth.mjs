@@ -94,6 +94,13 @@ export async function supabaseAuth(request,env){
    const token=bearer(request);if(!token)return reply(401,{message:'Inicia sesión.'},origin);
    try{return reply(200,{user:await supabaseIdentity(env,token)},origin);}catch(error){return reply(error.message==='permission'?403:401,{message:error.message==='permission'?'Tu cuenta no tiene acceso al equipo.':'La sesión ya no es válida.'},origin);}
   }
+  if(path==='/auth/password'&&request.method==='POST'){
+   const token=bearer(request);if(!token)return reply(401,{message:'La invitación ya no es válida.'},origin);
+   const v=await body(request);if(typeof v.password!=='string'||v.password.length<10||v.password.length>128)return reply(400,{message:'Usa una contraseña de al menos 10 caracteres.'},origin);
+   const response=await authFetch(env,'user',{method:'PUT',body:{password:v.password},token});const data=await response.json().catch(()=>({}));
+   if(!response.ok||!data.id)return reply(400,{message:'No pudimos guardar la contraseña. Pide una nueva invitación.'},origin);
+   try{return reply(200,{user:await supabaseIdentity(env,token)},origin);}catch{return reply(403,{message:'La cuenta no tiene acceso al equipo.'},origin);}
+  }
   if(path==='/auth/logout'&&request.method==='POST'){
    const token=bearer(request);if(token)await authFetch(env,'logout',{method:'POST',token}).catch(()=>{});
    return reply(200,{ok:true},origin);
