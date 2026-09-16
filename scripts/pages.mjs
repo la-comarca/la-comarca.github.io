@@ -13,6 +13,7 @@ const section=id=>original.match(new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</
 const dialogs=original.slice(original.indexOf('<dialog'),original.indexOf('<noscript'));
 const link=(path,label)=>`<a href="${base}${path}/">${label}<span aria-hidden="true">↗</span></a>`;
 const cmsURL=`${platformOrigin.replace(/\/$/,'')}/cms/`;
+const dockIcon=name=>({calendar:'<svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M7.5 3.5v4M16.5 3.5v4M3.5 10h17M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01"/></svg>',plus:'<svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg>',spark:'<svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7L12 3Z"/><path d="m19 17 .6 2.4L22 20l-2.4.6L19 23l-.6-2.4L16 20l2.4-.6L19 17Z"/></svg>',people:'<svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c.5-3.6 2.3-5.5 5.5-5.5s5 1.9 5.5 5.5M16 11a3 3 0 1 0 0-6M16 14.5c2.7.3 4.2 2 4.8 5.5"/></svg>'}[name]);
 const intro=(label,title,description)=>`<section class="page-intro"><span class="eyebrow">${label}</span><h1 class="page-title"><span class="word-mask"><span>${title}</span></span></h1><p>${description}</p></section>`;
 const block=(title,body)=>`<article class="info-block reveal"><h2>${title}</h2><div>${body}</div></article>`;
 const p=s=>`<p>${s}</p>`;
@@ -29,6 +30,7 @@ html=html.replaceAll('src="./assets/',`src="${base}assets/`).replaceAll('href="#
 html=html.replaceAll('href="https://la-comarca.notion.site/1b7057bc38f142a48d7cbe55dba73a0e"',`href="${base}participar/#inscripcion"`);
 html=html.replaceAll(`href="${base}equipo/"`,`href="${cmsURL}"`);
 html=html.replaceAll('href="https://la-comarca-formularios.la-comarca.workers.dev/cms/"',`href="${cmsURL}"`);
+html=html.replaceAll('<span aria-hidden="true">▣</span>Agenda',`${dockIcon('calendar')}Agenda`).replaceAll('<span aria-hidden="true">＋</span>Participar',`${dockIcon('plus')}Participar`).replaceAll('<span aria-hidden="true">✦</span>Recursos',`${dockIcon('spark')}Recursos`).replaceAll('<span aria-hidden="true">◯</span>Equipo',`${dockIcon('people')}Equipo`);
 await mkdir(`dist/${path}`,{recursive:true});await writeFile(`dist/${path?path+'/':''}index.html`,html);
 }
 async function redirectPage(path,target){await mkdir(`dist/${path}`,{recursive:true});await writeFile(`dist/${path}/index.html`,`<!doctype html><html lang="es-MX"><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${target}"><link rel="canonical" href="${target}"><title>Acceso del equipo · La Comarca</title><h1>Acceso del equipo</h1><p>Redirigiendo al <a href="${target}">acceso seguro del equipo</a>…</p></html>`);}
