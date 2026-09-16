@@ -4,6 +4,7 @@ import {cms} from './cms.mjs';
 import {team} from './team.mjs';
 import {publicAgenda,cachedAgenda} from './public-agenda.mjs';
 import {supabaseAuth} from './supabase-auth.mjs';
+import {backoffice} from './backoffice.mjs';
 export const activities=['Retiro mensual · 1 octubre 2026','Retiro semestral · 16–18 octubre 2026','Círculos','Catecismo','Despensas y visitas','Hikes y caminatas','Labor social','Aportaciones y donaciones','Proponer una actividad','Otras actividades'];
 export function validate(input){
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('Revisa los datos del formulario.');
@@ -23,8 +24,9 @@ export async function handle(request,env,fetcher=fetch){
  const path=new URL(request.url).pathname;
  if(path==='/public/materials')return publicMaterials(request,env,fetcher,typeof caches==='undefined'?undefined:caches.default);
  if(path==='/auth'||path.startsWith('/auth/'))return supabaseAuth(request,env);
+ if(path.startsWith('/backoffice/api/'))return backoffice(request,env,fetcher);
  if(path==='/cms'||path.startsWith('/cms/')||path==='/equipo/activar')return cms(request,env,fetcher);
- if(path==='/equipo'||path==='/equipo/')return env.ASSETS?env.ASSETS.fetch(request):new Response('Not found',{status:404});
+ if(path==='/equipo'||path==='/equipo/'||path==='/equipo/catecismo'||path.startsWith('/equipo/catecismo/'))return env.ASSETS?env.ASSETS.fetch(request):new Response('Not found',{status:404});
  if(path.startsWith('/equipo/'))return team(request,env,fetcher);
  if(['/public/agenda','/calendario.ics'].includes(path))return publicAgenda(request,env,fetcher);
  // Static Assets owns the public site. Only safe read requests that did not
