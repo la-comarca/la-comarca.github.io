@@ -13,6 +13,7 @@ async function readBody(request,max=30000){const text=await request.text();if(te
 const moduleFor=me=>(me.modules||[]).find(item=>item.key==='catecismo');
 const roleFor=me=>moduleFor(me)?.role||'';
 const canManage=me=>['admin','coordinator'].includes(roleFor(me));
+const canTakeAttendance=me=>['admin','coordinator','catechist'].includes(roleFor(me));
 
 async function currentProfile(db,env,me){const rows=await db(env,`rest/v1/profiles?auth_user_id=eq.${encodeURIComponent(me.id)}&select=id,email,display_name&limit=1`);return rows[0]||null;}
 async function scopeFor(db,env,me){
@@ -39,6 +40,7 @@ async function sessionWorkspace(db,env,id,scope){
  return {session,enrollments:enrollments.map(row=>({...row,attendance:byEnrollment.get(row.id)||{status:'unrecorded',note:''}}))};
 }
 async function saveAttendance(db,env,me,id,input,scope){
+ if(!canTakeAttendance(me))throw Object.assign(Error('Tu cuenta no puede registrar asistencia.'),{status:403});
  const session=await sessionById(db,env,id);if(!canSeeGroup(scope,session.group_id))throw Object.assign(Error('Sesión no encontrada.'),{status:404});
  const records=Array.isArray(input.records)?input.records:[];if(!records.length||records.length>150)throw Object.assign(Error('Revisa la lista de asistencia.'),{status:400});
  const enrollments=await db(env,`rest/v1/catechism_enrollments?group_id=eq.${session.group_id}&status=in.(active,paused,pending)&select=id`),allowed=new Set(enrollments.map(row=>row.id));
