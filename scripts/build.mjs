@@ -1,6 +1,7 @@
 import {createHash} from 'node:crypto';
 import {cp,mkdir,readFile,writeFile,rm,readdir} from 'node:fs/promises';
 import {calendar} from '../public/calendar.js';
+import {cleanPublicCopy} from './content-cleanup.mjs';
 const basePath=process.env.BASE_PATH||'/comarca/';if(!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(basePath))throw Error('BASE_PATH inválido');
 const oneSignalAppId=process.env.ONESIGNAL_APP_ID||'';if(oneSignalAppId&&!/^[a-f0-9-]{36}$/i.test(oneSignalAppId))throw Error('ONESIGNAL_APP_ID inválido');
 const registrationApi=process.env.REGISTRATION_API||'',turnstileSiteKey=process.env.TURNSTILE_SITE_KEY||'';
@@ -19,9 +20,6 @@ let html=await readFile('dist/index.html','utf8');html=html.replace('./styles.cs
 let app=await readFile('dist/app.js','utf8');app=app.replace("'./calendar.js'",`'./calendar.js?v=${version}'`).replace("'./motion.js'",`'./motion.js?v=${version}'`).replace("'./registration.js'",`'./registration.js?v=${version}'`).replace("'./formation.js'",`'./formation.js?v=${version}'`).replace("'./subscription.js'",`'./subscription.js?v=${version}'`);app+=`\nimport './home-announcements.js?v=${version}';\n`;await writeFile('dist/app.js',app);
 const {buildPages}=await import('./pages.mjs');await buildPages(data,basePath,version,platformOrigin);
 
-// pages.mjs owns the generated homepage. Replace its single-event priority card
-// with the dynamic announcements mount after generation so the live agenda can
-// render all upcoming non-weekly events and complete posters.
 const homePath='dist/index.html';let homeHTML=await readFile(homePath,'utf8');
 homeHTML=homeHTML.replace(/<section class="priority-banner"[\s\S]*?<\/section>/,`<section class="home-feature" aria-label="Próximos encuentros"><div class="home-announcements-head"><div><span class="eyebrow">LO QUE VIENE</span><h2>Próximos<br>encuentros.</h2></div><p>Cargando los próximos encuentros especiales…</p></div></section>`);
 await writeFile(homePath,homeHTML);
@@ -32,13 +30,9 @@ teamHTML=teamHTML.replace(/<section class="section team-login-section">[\s\S]*?<
 
 async function htmlFiles(dir){const out=[];for(const entry of await readdir(dir,{withFileTypes:true})){const path=`${dir}/${entry.name}`;if(entry.isDirectory())out.push(...await htmlFiles(path));else if(entry.name.endsWith('.html'))out.push(path);}return out;}
 for(const path of await htmlFiles('dist')){
- let page=await readFile(path,'utf8');
- // Public navigation always lands on the GitHub Pages team entry. Cloudflare is
- // an implementation detail reached only from the explicit secure-login action.
+ let page=cleanPublicCopy(await readFile(path,'utf8'));
  page=page.replaceAll(`href="${cmsURL}"`,`href="${basePath}equipo/"`).replaceAll('Acceso del equipo','Iniciar sesión');
- // The compact bottom menu keeps public Resources visible; team access remains
- // available in the desktop header/footer and at /equipo/.
- page=page.replace(/<a href="[^\"]*equipo\/"[^>]*><svg class="dock-icon"[\s\S]*?<\/svg>Equipo<\/a>/,`<a href="${basePath}recursos/">${`<svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7L12 3Z"/><path d="m19 17 .6 2.4L22 20l-2.4.6L19 23l-.6-2.4L16 20l2.4-.6L19 17Z"/></svg>`}Recursos</a>`);
+ page=page.replace(/<a href="[^\"]*equipo\/"[^>]*><svg class="dock-icon"[\s\S]*?<\/svg>Equipo<\/a>/,`<a href="${basePath}recursos/"><svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7L12 3Z"/><path d="m19 17 .6 2.4L22 20l-2.4.6L19 23l-.6-2.4L16 20l2.4-.6L19 17Z"/></svg>Recursos</a>`);
  if(path===teamPath)page=page.replace(`href="${basePath}equipo/" target="_blank" rel="noopener noreferrer">Abrir inicio de sesión`,`href="${cmsURL}" target="_blank" rel="noopener noreferrer">Abrir inicio de sesión`);
  await writeFile(path,page);
 }
