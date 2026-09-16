@@ -18,8 +18,28 @@ const version=createHash('sha256').update(await readFile('public/app.js')).updat
 let html=await readFile('dist/index.html','utf8');html=html.replace('./styles.css',`./styles.css?v=${version}`).replace('./app.js',`./app.js?v=${version}`);await writeFile('dist/index.html',html);
 let app=await readFile('dist/app.js','utf8');app=app.replace("'./calendar.js'",`'./calendar.js?v=${version}'`).replace("'./motion.js'",`'./motion.js?v=${version}'`).replace("'./registration.js'",`'./registration.js?v=${version}'`).replace("'./formation.js'",`'./formation.js?v=${version}'`).replace("'./subscription.js'",`'./subscription.js?v=${version}'`);app+=`\nimport './home-announcements.js?v=${version}';\n`;await writeFile('dist/app.js',app);
 const {buildPages}=await import('./pages.mjs');await buildPages(data,basePath,version,platformOrigin);
+
+// pages.mjs owns the generated homepage. Replace its single-event priority card
+// with the dynamic announcements mount after generation so the live agenda can
+// render all upcoming non-weekly events and complete posters.
+const homePath='dist/index.html';let homeHTML=await readFile(homePath,'utf8');
+homeHTML=homeHTML.replace(/<section class="priority-banner"[\s\S]*?<\/section>/,`<section class="home-feature" aria-label="Próximos encuentros"><div class="home-announcements-head"><div><span class="eyebrow">LO QUE VIENE</span><h2>Próximos<br>encuentros.</h2></div><p>Cargando los próximos encuentros especiales…</p></div></section>`);
+await writeFile(homePath,homeHTML);
+
 const teamPath='dist/equipo/index.html',cmsURL=platformOrigin.replace(/\/$/,'')+'/cms/';let teamHTML=await readFile(teamPath,'utf8');
-teamHTML=teamHTML.replace(/<section class="page-intro[^"]*">[\s\S]*?<\/section>/,`<section class="page-intro login-intro"><span class="eyebrow">BACK OFFICE</span><h1 class="page-title"><span class="word-mask"><span>Iniciar<br>sesión.</span></span></h1><p>Acceso privado para quienes coordinan La Comarca. La autenticación y los permisos se gestionan en el servidor seguro.</p></section>`);
-teamHTML=teamHTML.replace(/<section class="section team-login-section">[\s\S]*?<\/section>/,`<section class="section login-page"><div class="login-shell"><div class="login-copy"><span class="eyebrow">ACCESO DEL EQUIPO</span><h2>Tu espacio de trabajo,<br>en un solo lugar.</h2><p>Entra al back office para organizar agenda, personas, asistencia, materiales y seguimiento. El sitio público permanece separado de la información interna.</p><p class="login-help">¿Es tu primera vez? Pide una invitación al administrador antes de intentar entrar.</p></div><div class="login-panel"><div class="login-mark" aria-hidden="true">↗</div><h3>Back office de La Comarca</h3><p>Continuarás al acceso seguro, donde podrás introducir tu correo y contraseña.</p><a class="button login-button" href="${cmsURL}">Iniciar sesión <span aria-hidden="true">↗</span></a></div></div></section>`).replaceAll('Acceso del equipo','Iniciar sesión');await writeFile(teamPath,teamHTML);
+teamHTML=teamHTML.replace(/<section class="page-intro[^"]*">[\s\S]*?<\/section>/,`<section class="page-intro login-intro"><span class="eyebrow">EQUIPO</span><h1 class="page-title"><span class="word-mask"><span>Iniciar<br>sesión.</span></span></h1><p>Acceso privado para quienes coordinan La Comarca. Esta entrada permanece dentro del sitio de GitHub Pages; los permisos se validan siempre en el servidor.</p></section>`);
+teamHTML=teamHTML.replace(/<section class="section team-login-section">[\s\S]*?<\/section>/,`<section class="section login-page"><div class="login-shell"><div class="login-copy"><span class="eyebrow">ACCESO DEL EQUIPO</span><h2>Tu espacio de trabajo,<br>en un solo lugar.</h2><p>Los accesos operativos contemplan Agenda, Materiales, Catecismo, Traslados e Inscripciones. Cuando la conexión de Supabase está activa, el servidor sincroniza membresías y permisos antes de autorizar cada módulo.</p><p class="login-help">La página de entrada se queda en la-comarca.github.io. La sesión segura se abre aparte para no debilitar las protecciones de origen y cookies del back office.</p></div><div class="login-panel"><div class="login-mark" aria-hidden="true">↗</div><h3>Acceso seguro</h3><p>Usa tu correo y contraseña autorizados. La validación de sesión y permisos sigue siendo del servidor; no se exponen llaves de Supabase en el navegador.</p><a class="button login-button" href="${cmsURL}" target="_blank" rel="noopener noreferrer">Abrir inicio de sesión <span aria-hidden="true">↗</span></a></div></div></section>`).replaceAll('Acceso del equipo','Iniciar sesión');await writeFile(teamPath,teamHTML);
+
 async function htmlFiles(dir){const out=[];for(const entry of await readdir(dir,{withFileTypes:true})){const path=`${dir}/${entry.name}`;if(entry.isDirectory())out.push(...await htmlFiles(path));else if(entry.name.endsWith('.html'))out.push(path);}return out;}
-for(const path of await htmlFiles('dist')){let page=await readFile(path,'utf8');const next=page.replaceAll('Acceso del equipo','Iniciar sesión');if(next!==page)await writeFile(path,next);}await import('./check-site.mjs');
+for(const path of await htmlFiles('dist')){
+ let page=await readFile(path,'utf8');
+ // Public navigation always lands on the GitHub Pages team entry. Cloudflare is
+ // an implementation detail reached only from the explicit secure-login action.
+ page=page.replaceAll(`href="${cmsURL}"`,`href="${basePath}equipo/"`).replaceAll('Acceso del equipo','Iniciar sesión');
+ // The compact bottom menu keeps public Resources visible; team access remains
+ // available in the desktop header/footer and at /equipo/.
+ page=page.replace(/<a href="[^\"]*equipo\/"[^>]*><svg class="dock-icon"[\s\S]*?<\/svg>Equipo<\/a>/,`<a href="${basePath}recursos/">${`<svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7L12 3Z"/><path d="m19 17 .6 2.4L22 20l-2.4.6L19 23l-.6-2.4L16 20l2.4-.6L19 17Z"/></svg>`}Recursos</a>`);
+ if(path===teamPath)page=page.replace(`href="${basePath}equipo/" target="_blank" rel="noopener noreferrer">Abrir inicio de sesión`,`href="${cmsURL}" target="_blank" rel="noopener noreferrer">Abrir inicio de sesión`);
+ await writeFile(path,page);
+}
+await import('./check-site.mjs');
