@@ -1,52 +1,8 @@
 /* Visual QA pass — Homepage and Agenda are the reference system. */
+h1,.page-title,.footer-wordmark,.type-track,.date-stamp>span,.index,.login-mark{font-weight:600!important;font-synthesis:none}.word-mask{padding-block:.06em .1em;margin-bottom:-.08em;overflow:clip}.page-title{overflow:visible!important}.activities,.prayer-more{color:#fff}.activities h1,.activities h2,.activities h3,.activities strong,.activities a,.prayer-more h1,.prayer-more h2,.prayer-more h3,.prayer-more strong,.prayer-more a{color:#fff}.activities p,.prayer-more p{color:#d4e3ec!important}.activities .eyebrow,.prayer-more .eyebrow{color:#c5d7e2!important}.prayer-stacks button:focus-visible,.login-button:focus-visible{outline:2px solid var(--blue);outline-offset:4px}.activities a:focus-visible,.prayer-more a:focus-visible{outline-color:#fff}.prayer-stacks{display:flex;flex-wrap:wrap;gap:0;margin:0 0 24px;padding:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}.prayer-stacks button{min-height:48px;margin:0;padding:0 22px;border:0;border-right:1px solid var(--line);border-radius:0;background:transparent;color:var(--muted);font:600 .72rem 'DM Sans',sans-serif;letter-spacing:.045em}.prayer-stacks button:first-child{padding-left:0}.prayer-stacks button:hover{background:#eef1f3;color:var(--blue)}.prayer-stacks button.active,.prayer-stacks button[aria-pressed=true]{background:var(--blue);color:#fff;padding-left:22px}.prayer-entry[hidden]{display:none!important}.prayer-entry summary{grid-template-columns:minmax(0,1fr) 34px!important}.prayer-entry-content{padding-left:0!important}.prayer-empty{padding:30px 0;border-bottom:1px solid var(--line)}body:has(.login-page) .header,body:has(.login-page) .footer{visibility:visible}.login-panel{background:#f3f5f6;padding-top:48px;padding-bottom:48px;padding-right:48px}.login-button:hover,.login-button:focus-visible{color:var(--blue)}
 
-/* Barlow Condensed is loaded only at 600/700/800: never synthesize 400/500. */
-h1,.page-title,.footer-wordmark,.type-track,.date-stamp>span,.index,.login-mark{font-weight:600!important;font-synthesis:none}
-.word-mask{padding-block:.06em .1em;margin-bottom:-.08em;overflow:clip}
-.page-title{overflow:visible!important}
+/* Homepage announcements: dynamic non-weekly events, poster-first when artwork exists. */
+.home-feature{padding:90px 4%;max-width:1800px;margin:0 auto;border-top:1px solid var(--line)}.home-announcements-head{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:8%;align-items:end;margin-bottom:42px}.home-announcements-head h2{margin:0}.home-announcements-head>p{max-width:430px;margin:0 0 8px}.home-announcements-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--ink)}.home-announcement{min-height:360px;display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,42%);gap:28px;padding:32px 30px 32px 0;border-bottom:1px solid var(--line);text-decoration:none;overflow:hidden}.home-announcement:nth-child(odd){border-right:1px solid var(--line);padding-right:30px}.home-announcement:nth-child(even){padding-left:30px}.home-announcement-copy{display:flex;flex-direction:column;min-width:0}.home-announcement-copy small{font-size:.58rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}.home-announcement-copy h3{font-size:clamp(1.8rem,3vw,3rem);margin:22px 0 15px}.home-announcement-copy p{font-size:.82rem;line-height:1.6}.home-announcement-copy>span{margin-top:auto;font-size:.76rem}.home-announcement figure{margin:0;min-width:0;align-self:stretch;background:#eef0f1;display:grid;place-items:center;overflow:hidden}.home-announcement figure img{display:block;width:100%;height:100%;max-height:440px;object-fit:contain;transition:transform .5s var(--ease)}.home-announcement:hover figure img,.home-announcement:focus-visible figure img{transform:scale(1.025)}.home-announcement-date{align-self:stretch;background:var(--blue);color:#fff;display:flex;flex-direction:column;justify-content:flex-end;padding:24px}.home-announcement-date strong{font:600 clamp(4rem,8vw,7rem)/.8 'Barlow Condensed',sans-serif}.home-announcement-date span{text-transform:uppercase;font-size:.72rem;letter-spacing:.1em;margin-top:15px}.home-announcement:hover,.home-announcement:focus-within{background:#f2f3f4}.home-announcements-foot{display:flex;justify-content:flex-end;padding-top:26px}.home-announcements-empty{grid-column:1/-1;padding:40px 0}.home-announcements-empty p{margin-bottom:8px}
 
-/* Dark/blue surfaces must never inherit black body copy. */
-.activities,.prayer-more{color:#fff}
-.activities h1,.activities h2,.activities h3,.activities strong,.activities a,.prayer-more h1,.prayer-more h2,.prayer-more h3,.prayer-more strong,.prayer-more a{color:#fff}
-.activities p,.prayer-more p{color:#d4e3ec!important}
-.activities .eyebrow,.prayer-more .eyebrow{color:#c5d7e2!important}
-
-/* Consistent keyboard treatment, including dark surfaces. */
-.prayer-stacks button:focus-visible,.login-button:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
-.activities a:focus-visible,.prayer-more a:focus-visible{outline-color:#fff}
-
-/* Devocionario — editorial tabs, not pills; one quiet vertical stack. */
-.prayer-stacks{display:flex;flex-wrap:wrap;gap:0;margin:0 0 24px;padding:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
-.prayer-stacks button{min-height:48px;margin:0;padding:0 22px;border:0;border-right:1px solid var(--line);border-radius:0;background:transparent;color:var(--muted);font:600 .72rem 'DM Sans',sans-serif;letter-spacing:.045em;transition:background .2s,color .2s}
-.prayer-stacks button:first-child{padding-left:0;padding-right:22px}
-.prayer-stacks button:hover{background:#eef1f3;color:var(--blue)}
-.prayer-stacks button.active,.prayer-stacks button[aria-pressed=true]{background:var(--blue);color:#fff;padding-left:22px}
-.prayer-stacks button.active:hover{background:var(--blue);color:#fff}
-.prayer-entry[hidden]{display:none!important}
-.prayer-entry summary{grid-template-columns:minmax(0,1fr) 34px!important}
-.prayer-entry-content{padding-left:0!important}
-.prayer-empty{padding:30px 0;border-bottom:1px solid var(--line)}
-
-/* Public sign-in should feel like a page in the site, not a separate app. */
-body:has(.login-page) .header,body:has(.login-page) .footer{visibility:visible}
-.login-panel{background:#f3f5f6;padding-top:48px;padding-bottom:48px;padding-right:48px}
-.login-button:hover,.login-button:focus-visible{color:var(--blue)}
-
-/* Avoid hover-induced clipping/jumps on compact screens. */
-@media(max-width:700px){
-  .word-mask{padding-bottom:.12em;margin-bottom:-.08em}
-  .prayer-stacks{flex-wrap:nowrap;overflow-x:auto;margin:0 -5% 22px;padding:0 5%;scrollbar-width:none}
-  .prayer-stacks::-webkit-scrollbar{display:none}
-  .prayer-stacks button,.prayer-stacks button:first-child{flex:0 0 auto;min-height:44px;padding:0 14px}
-  .prayer-stacks button:first-child{padding-left:0}
-  .prayer-stacks button.active,.prayer-stacks button[aria-pressed=true]{padding-left:14px}
-  .prayer-entry summary{grid-template-columns:minmax(0,1fr) 28px!important;gap:12px!important}
-  .prayer-entry-content{padding-left:0!important}
-  .prayer-columns{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}
-  .prayer-verses{overflow-wrap:anywhere;hyphens:auto}
-  .login-panel{padding:30px 24px}
-}
-
-@media(hover:none){
-  .event-card:hover,.prayer-entry summary:hover{padding-left:inherit;padding-right:inherit}
-}
+@media(max-width:700px){.word-mask{padding-bottom:.12em;margin-bottom:-.08em}.prayer-stacks{flex-wrap:nowrap;overflow-x:auto;margin:0 -5% 22px;padding:0 5%;scrollbar-width:none}.prayer-stacks::-webkit-scrollbar{display:none}.prayer-stacks button,.prayer-stacks button:first-child{flex:0 0 auto;min-height:44px;padding:0 14px}.prayer-stacks button:first-child{padding-left:0}.prayer-stacks button.active,.prayer-stacks button[aria-pressed=true]{padding-left:14px}.prayer-entry summary{grid-template-columns:minmax(0,1fr) 28px!important;gap:12px!important}.prayer-entry-content{padding-left:0!important}.prayer-columns{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}.prayer-verses{overflow-wrap:anywhere;hyphens:auto}.login-panel{padding:30px 24px}.home-feature{padding:64px 5%}.home-announcements-head{grid-template-columns:1fr;gap:18px;margin-bottom:30px}.home-announcements-grid{grid-template-columns:1fr}.home-announcement,.home-announcement:nth-child(odd),.home-announcement:nth-child(even){grid-template-columns:minmax(0,1fr) minmax(125px,40%);gap:16px;min-height:270px;padding:24px 0;border-right:0}.home-announcement figure img{max-height:330px}.home-announcement-copy h3{font-size:1.65rem;margin:15px 0 10px}.home-announcement-date{padding:16px}.home-announcement-date strong{font-size:4.5rem}}
+@media(hover:none){.event-card:hover,.prayer-entry summary:hover{padding-left:inherit;padding-right:inherit}}
