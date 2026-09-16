@@ -19,6 +19,7 @@ const block=(title,body)=>`<article class="info-block reveal"><h2>${title}</h2><
 const p=s=>`<p>${s}</p>`;
 const cta=`<div class="page-cta"><h2>Coordinar el encuentro.</h2><a class="button signup" href="#">Consultar con el equipo ↗</a><p>El equipo confirma los detalles contigo después de recibir tu solicitud.</p></div>`;
 	const nav=[['agenda','Agenda'],['participar','Participar'],['recursos','Recursos']];
+const footerMarkup=`<footer class="footer"><div class="footer-top"><p>Formación. Amistad. Servicio.</p><div class="footer-directory"><nav aria-label="Usar La Comarca"><h2>En el día a día</h2>${link('agenda','Agenda')}${link('mi-calendario','Mi calendario')}${link('avisos','Avisos')}${link('participar','Participar')}</nav><nav aria-label="Información y acceso"><h2>Información</h2>${link('recursos','Recursos')}${link('preguntas','Preguntas')}${link('ayuda','Ayuda')}<a href="${cmsURL}">Acceso del equipo<span aria-hidden="true">↗</span></a></nav></div></div><a class="footer-wordmark" href="${base}">LA COMARCA.</a><small id="updated"></small><p class="footer-note">Agenda, avisos y recursos para quienes forman parte de La Comarca. La organización, los datos de alumnos y la gestión interna se mantienen privados.</p></footer>`;
 async function page(path,title,description,body,active=''){
 if(path==='biblioteca')title='Libros que conviene leer';
 body=addEditorial(path,body,base);
@@ -36,6 +37,7 @@ html=html.replaceAll('href="https://la-comarca.notion.site/1b7057bc38f142a48d7cb
 html=html.replaceAll(`href="${base}equipo/"`,`href="${cmsURL}"`);
 html=html.replaceAll('href="https://la-comarca-formularios.la-comarca.workers.dev/cms/"',`href="${cmsURL}"`);
 html=html.replaceAll('<span aria-hidden="true">▣</span>Agenda',`${dockIcon('calendar')}Agenda`).replaceAll('<span aria-hidden="true">＋</span>Participar',`${dockIcon('plus')}Participar`).replaceAll('<span aria-hidden="true">✦</span>Recursos',`${dockIcon('spark')}Recursos`).replaceAll('<span aria-hidden="true">◯</span>Equipo',`${dockIcon('people')}Equipo`);
+html=html.replace(/<footer class="footer">[\s\S]*?<\/footer>/,footerMarkup);
 await mkdir(`dist/${path}`,{recursive:true});await writeFile(`dist/${path?path+'/':''}index.html`,html);
 }
 async function redirectPage(path,target){await mkdir(`dist/${path}`,{recursive:true});await writeFile(`dist/${path}/index.html`,`<!doctype html><html lang="es-MX"><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${target}"><link rel="canonical" href="${target}"><title>Acceso del equipo · La Comarca</title><h1>Acceso del equipo</h1><p>Redirigiendo al <a href="${target}">acceso seguro del equipo</a>…</p></html>`);}
