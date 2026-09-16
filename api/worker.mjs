@@ -3,6 +3,7 @@ import {publicMaterials} from './public-materials.mjs';
 import {cms} from './cms.mjs';
 import {team} from './team.mjs';
 import {publicAgenda,cachedAgenda} from './public-agenda.mjs';
+import {supabaseAuth} from './supabase-auth.mjs';
 export const activities=['Retiro mensual · 1 octubre 2026','Retiro semestral · 16–18 octubre 2026','Círculos','Catecismo','Despensas y visitas','Hikes y caminatas','Labor social','Aportaciones y donaciones','Proponer una actividad','Otras actividades'];
 export function validate(input){
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('Revisa los datos del formulario.');
@@ -21,10 +22,11 @@ async function readBounded(request){const reader=request.body?.getReader();if(!r
 export async function handle(request,env,fetcher=fetch){
  const path=new URL(request.url).pathname;
  if(path==='/public/materials')return publicMaterials(request,env,fetcher,typeof caches==='undefined'?undefined:caches.default);
+ if(path==='/auth'||path.startsWith('/auth/'))return supabaseAuth(request,env);
  if(path==='/cms'||path.startsWith('/cms/')||path==='/equipo/activar')return cms(request,env,fetcher);
- if(path==='/equipo'||path==='/equipo/')return Response.redirect(new URL('/cms/',request.url),302);
- if(new URL(request.url).pathname==='/equipo'||new URL(request.url).pathname.startsWith('/equipo/'))return team(request,env,fetcher);
- if(['/public/agenda','/calendario.ics'].includes(new URL(request.url).pathname))return publicAgenda(request,env,fetcher);
+ if(path==='/equipo'||path==='/equipo/')return env.ASSETS?env.ASSETS.fetch(request):new Response('Not found',{status:404});
+ if(path.startsWith('/equipo/'))return team(request,env,fetcher);
+ if(['/public/agenda','/calendario.ics'].includes(path))return publicAgenda(request,env,fetcher);
  // Static Assets owns the public site. Only safe read requests that did not
  // already match an application route may fall through to it.
  if(['GET','HEAD'].includes(request.method)&&path!=='/solicitudes'&&env.ASSETS)return env.ASSETS.fetch(request);
@@ -33,7 +35,7 @@ export async function handle(request,env,fetcher=fetch){
  const reply=(status,message)=>new Response(JSON.stringify({ok:status===201,message}),{status,headers});
  if(!origin||!allowed.includes(origin))return reply(403,'Origen no permitido.');
  headers['Access-Control-Allow-Origin']=origin;
- if(new URL(request.url).pathname!=='/solicitudes')return reply(404,'Ruta no disponible.');
+ if(path!=='/solicitudes')return reply(404,'Ruta no disponible.');
  if(request.method==='OPTIONS'){headers['Access-Control-Allow-Methods']='POST, OPTIONS';headers['Access-Control-Allow-Headers']='Content-Type';return new Response(null,{status:204,headers});}
  if(request.method!=='POST')return reply(405,'Método no disponible.');
  if(!env.NOTION_TOKEN||!env.TURNSTILE_SECRET_KEY||!env.FORM_LIMIT)return reply(503,'El formulario está en preparación. Inténtalo más tarde.');
