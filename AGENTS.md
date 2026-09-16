@@ -15,9 +15,11 @@ This repository contains the public La Comarca site and its separate Cloudflare 
 - **The homepage and `/agenda/` define the public visual language.** New or repaired public pages must feel like the same product before introducing page-specific styling.
 - Reuse the existing tokens and typography: deep blue `#133b58`, ink `#111519`, paper `#fafafa`, muted text `#65686d`, rules `#d9dbde`, DM Sans for the main interface and Barlow Condensed for display headings. Georgia may be used only for long-form prayer text where it improves reading; it must not replace the shared interface typography.
 - Keep the layout editorial, restrained and spacious: strong hierarchy, fine rules, few surfaces, minimal decoration, responsive behavior and reduced-motion support.
-- Do not invent a separate visual theme for Devocionario, Equipo/Login, Agenda or another route unless the user explicitly requests a distinct identity. Avoid decorative palettes, tilted cards, novelty typefaces and dense dashboard-like chrome on public pages.
-- Devocionario should use a single-column index like the rest of the site; bilingual columns belong inside an opened prayer, and collapse to one column on phones.
-- The public Equipo page is a gateway, not an authentication implementation. It must hand users to the real private backend; never present a form on GitHub Pages that appears to authenticate against the static origin.
+- Do not invent a separate visual theme for Devocionario, Iniciar sesión, Agenda or another route unless the user explicitly requests a distinct identity. Avoid decorative palettes, tilted cards, novelty typefaces and dense dashboard-like chrome on public pages.
+- Devocionario should be fast to use: one search box, a few contextual quick filters (for example Rosario, Bendición con el Santísimo, Misa, María), then a single vertical stack of prayers. Do not make its filter sticky or turn it into a dashboard.
+- Inside every opened prayer, **Spanish and Latin must remain visible side-by-side even on phones.** Reduce type and spacing responsibly on narrow screens rather than collapsing to a single language column.
+- The public `/equipo/` route should present itself as **Iniciar sesión** and use the same header, footer, typography and spacing as the public site. It is a sign-in entry to the real back office, not a separate branded microsite.
+- GitHub Pages must never pretend to authenticate locally. The public sign-in entry hands the user to the real private backend, where email/password authentication and permissions are actually enforced.
 - Before changing a public page, inspect `public/index.html`, `public/styles.css`, `public/editorial-fix.css`, `scripts/pages.mjs` and the affected generator. Preserve working navigation, mobile dock, accessibility and established content structure.
 
 ## Security and architecture
