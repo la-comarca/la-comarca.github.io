@@ -29,7 +29,7 @@ async function provisionFirstAdministrator(env,user,email){
  return {profile,modules:workspaces.map(workspace=>({key:workspace.key,name:workspace.name||workspace.key,description:workspace.description||'',role:'admin',scope:{}}))};
 }
 
-async function identity(env,accessToken){
+export async function supabaseIdentity(env,accessToken){
  const response=await authFetch(env,'user',{token:accessToken});
  if(!response.ok)throw Error('session');
  const user=await response.json();
@@ -82,17 +82,17 @@ export async function supabaseAuth(request,env){
    const response=await authFetch(env,'token?grant_type=password',{method:'POST',body:{email:v.email.trim().toLowerCase(),password:v.password}});
    const data=await response.json().catch(()=>({}));
    if(!response.ok||!data.access_token)return reply(401,{message:'No pudimos iniciar sesión. Revisa tus datos o confirma que tu cuenta esté activa.'},origin);
-   try{const me=await identity(env,data.access_token);return reply(200,{access_token:data.access_token,refresh_token:data.refresh_token,expires_in:data.expires_in,token_type:data.token_type,user:me},origin);}catch(error){return reply(error.message==='permission'?403:401,{message:error.message==='permission'?'Tu cuenta existe, pero todavía no tiene acceso al equipo.':'No pudimos validar la sesión.'},origin);}
+   try{const me=await supabaseIdentity(env,data.access_token);return reply(200,{access_token:data.access_token,refresh_token:data.refresh_token,expires_in:data.expires_in,token_type:data.token_type,user:me},origin);}catch(error){return reply(error.message==='permission'?403:401,{message:error.message==='permission'?'Tu cuenta existe, pero todavía no tiene acceso al equipo.':'No pudimos validar la sesión.'},origin);}
   }
   if(path==='/auth/refresh'&&request.method==='POST'){
    const v=await body(request);if(typeof v.refresh_token!=='string'||v.refresh_token.length>4096)return reply(400,{message:'Sesión no válida.'},origin);
    const response=await authFetch(env,'token?grant_type=refresh_token',{method:'POST',body:{refresh_token:v.refresh_token}});const data=await response.json().catch(()=>({}));
    if(!response.ok||!data.access_token)return reply(401,{message:'Tu sesión terminó. Inicia sesión de nuevo.'},origin);
-   try{const me=await identity(env,data.access_token);return reply(200,{access_token:data.access_token,refresh_token:data.refresh_token||v.refresh_token,expires_in:data.expires_in,token_type:data.token_type,user:me},origin);}catch(error){return reply(error.message==='permission'?403:401,{message:error.message==='permission'?'Tu cuenta ya no tiene acceso al equipo.':'Tu sesión terminó. Inicia sesión de nuevo.'},origin);}
+   try{const me=await supabaseIdentity(env,data.access_token);return reply(200,{access_token:data.access_token,refresh_token:data.refresh_token||v.refresh_token,expires_in:data.expires_in,token_type:data.token_type,user:me},origin);}catch(error){return reply(error.message==='permission'?403:401,{message:error.message==='permission'?'Tu cuenta ya no tiene acceso al equipo.':'Tu sesión terminó. Inicia sesión de nuevo.'},origin);}
   }
   if(path==='/auth/me'&&request.method==='GET'){
    const token=bearer(request);if(!token)return reply(401,{message:'Inicia sesión.'},origin);
-   try{return reply(200,{user:await identity(env,token)},origin);}catch(error){return reply(error.message==='permission'?403:401,{message:error.message==='permission'?'Tu cuenta no tiene acceso al equipo.':'La sesión ya no es válida.'},origin);}
+   try{return reply(200,{user:await supabaseIdentity(env,token)},origin);}catch(error){return reply(error.message==='permission'?403:401,{message:error.message==='permission'?'Tu cuenta no tiene acceso al equipo.':'La sesión ya no es válida.'},origin);}
   }
   if(path==='/auth/logout'&&request.method==='POST'){
    const token=bearer(request);if(token)await authFetch(env,'logout',{method:'POST',token}).catch(()=>{});
