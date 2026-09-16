@@ -1,5 +1,8 @@
 /* Mobile QA layer — mirrors the public La Comarca shell, then optimizes every back-office workflow for touch. */
 
+/* Keep browser text scaling predictable without disabling pinch zoom or accessibility zoom. */
+.bo-body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
 /* Top actions should read as actions, not decorative links. */
 .bo-page-actions{gap:10px;flex-wrap:nowrap;padding-bottom:0}
 .bo-page-actions .bo-button{min-width:128px;min-height:44px!important;justify-content:center;white-space:nowrap}
@@ -15,6 +18,9 @@
 }
 
 @media(max-width:760px){
+  /* iOS/Safari zooms focused controls smaller than 16px. Keep every editable control at 16px minimum. */
+  .bo-body input:not([type="checkbox"]):not([type="radio"]),.bo-body select,.bo-body textarea{font-size:16px!important;line-height:1.35}
+
   /* Match the public mobile shell: light brand header + blue rounded dock. */
   .bo-body{padding-bottom:calc(84px + env(safe-area-inset-bottom));overflow-x:hidden}
   .bo-site-header{display:none!important}
@@ -92,7 +98,6 @@
   .bo-person-card{grid-template-columns:40px minmax(0,1fr) 36px;gap:12px;min-height:78px;padding:14px 0}
   .bo-person-copy{min-width:0}.bo-person-copy strong{font-size:.91rem;overflow-wrap:anywhere}.bo-person-copy small{font-size:.63rem;line-height:1.45}
   .bo-search{min-height:48px;margin-bottom:22px}
-  .bo-search input{font-size:.82rem}
 
   /* Classroom detail: horizontally scrollable tabs that stay reachable. */
   .bo-detail-head{display:block;margin-bottom:18px;padding-bottom:20px}
@@ -139,7 +144,7 @@
   .bo-sheet-card h2{font-size:2.85rem;margin-top:9px}.bo-setup-dialog h2{font-size:2.8rem}.bo-access-shell>header h2{font-size:3rem}
   .bo-sheet-card header button,.bo-setup-dialog header button,.bo-access-shell>header button{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0}
   .bo-sheet-body,.bo-setup-form-body{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:22px 5% 28px;gap:20px}
-  .bo-field input,.bo-field select,.bo-field textarea,.bo-setup-dialog .bo-field input,.bo-setup-dialog .bo-field select,.bo-setup-dialog .bo-field textarea{min-height:48px;font-size:.88rem}
+  .bo-field input,.bo-field select,.bo-field textarea,.bo-setup-dialog .bo-field input,.bo-setup-dialog .bo-field select,.bo-setup-dialog .bo-field textarea{min-height:48px}
   .bo-field textarea,.bo-setup-dialog .bo-field textarea{min-height:118px}
   .bo-sheet-status,.bo-setup-form-status{padding:0 5%;font-size:.69rem}
   .bo-sheet-card>footer,.bo-setup-dialog form>footer{position:sticky;bottom:0;z-index:4;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 5% calc(14px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--paper) 96%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
@@ -156,7 +161,7 @@
   .bo-access-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 14px;min-height:0;padding:18px 0}
   .bo-access-person{min-width:0}.bo-access-person strong{font-size:.88rem;overflow-wrap:anywhere}.bo-access-person small{font-size:.63rem;overflow-wrap:anywhere}
   .bo-access-status{justify-self:end;font-size:.55rem}
-  .bo-access-row label{grid-column:1/-1;min-width:0}.bo-access-row select{min-height:44px;font-size:.72rem}
+  .bo-access-row label{grid-column:1/-1;min-width:0}.bo-access-row select{min-height:44px}
   .bo-access-row .bo-button{grid-column:1/-1;width:100%;justify-content:center}
   .bo-access-toggle{min-height:44px}
 
