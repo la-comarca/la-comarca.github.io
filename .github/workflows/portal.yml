@@ -43,6 +43,14 @@ jobs:
           TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
           ONESIGNAL_APP_ID: ${{ vars.ONESIGNAL_APP_ID }}
         run: npm run build
+      - name: Identificar la revisión publicada
+        run: |
+          node --input-type=module <<'NODE'
+          import {writeFile} from 'node:fs/promises';
+          const commit=process.env.GITHUB_SHA;
+          if(!/^[a-f0-9]{40}$/i.test(commit||'')) throw Error('Commit inválido');
+          await writeFile('dist/deployment.json',JSON.stringify({target:'github-pages',commit})+'\n');
+          NODE
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -57,6 +65,38 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verificar revisión y páginas públicas
+        env:
+          PAGES_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {setTimeout as delay} from 'node:timers/promises';
+          const expected=process.env.GITHUB_SHA;
+          const base=new URL(process.env.PAGES_URL);
+          if(base.protocol!=='https:'||!/^[a-f0-9]{40}$/i.test(expected||'')) throw Error('Datos de despliegue inválidos');
+          if(!base.pathname.endsWith('/')) base.pathname+='/' ;
+          async function read(path,type){
+            const url=new URL(path,base);url.searchParams.set('verify',expected+'-'+Date.now());
+            const response=await fetch(url,{cache:'no-store',headers:{'Cache-Control':'no-cache'},redirect:'error',signal:AbortSignal.timeout(15000)});
+            if(!response.ok) throw Error(`${path||'/'} respondió ${response.status}`);
+            const contentType=response.headers.get('content-type')||'';
+            if(type&&!contentType.includes(type)) throw Error(`Tipo inesperado en ${path||'/'}`);
+            const text=await response.text();if(!text.trim()) throw Error(`Respuesta vacía en ${path||'/'}`);
+            return text;
+          }
+          let marker;
+          for(let attempt=0;attempt<12;attempt++){
+            try{marker=JSON.parse(await read('deployment.json','application/json'));if(marker.commit!==expected)throw Error('GitHub Pages todavía sirve otra revisión');break;}
+            catch(error){if(attempt===11)throw error;await delay(5000);}
+          }
+          for(const [path,type] of [['','text/html'],['agenda/','text/html'],['oracion/','text/html'],['equipo/','text/html'],['styles.css','text/css']]){
+            await read(path,type);console.log(`OK ${new URL(path,base)}`);
+          }
+          console.log(`GitHub Pages verificado @ ${expected}: ${base.href}`);
+          NODE
