@@ -19,6 +19,7 @@
     "CMS_ORIGIN": "https://comarca.kipadmon.com",
     "SUPABASE_URL": "https://towouvaslpawbdzvksjo.supabase.co",
     "SUPABASE_PROFILE_SYNC_ENABLED": "true",
+    "TEAM_INVITE_REDIRECT": "https://la-comarca.github.io/equipo/",
     "ALLOWED_ORIGINS": "https://comarca.kipadmon.com,https://la-comarca.github.io,https://jadrk040507.github.io,https://la-comarca-formularios.la-comarca.workers.dev",
     "PUBLIC_AGENDA_SOURCE": "notion",
     "CMS_CONNECTED_MODULES": "materials,transport,students,attendance,lessons,grades,topics,shifts,registrations",
