@@ -10,9 +10,10 @@ test('Unknown safe public reads fall back to the same-origin static site',async(
  const response=await handle(new Request('https://example.com/agenda/'),{...env,ASSETS:assets});
  assert.equal(response.status,200);assert.equal(await response.text(),'public site');assert.equal(served,'/agenda/');
 });
-test('Legacy team entry redirects to the same-page CMS login',async()=>{
- const response=await handle(new Request('https://example.com/equipo/'),{});
- assert.equal(response.status,302);assert.equal(response.headers.get('location'),'https://example.com/cms/');
+test('Team entry remains on the static site instead of redirecting to CMS',async()=>{
+ let served='';const assets={fetch:async request=>{served=new URL(request.url).pathname;return new Response('static team page');}};
+ const response=await handle(new Request('https://example.com/equipo/'),{...env,ASSETS:assets});
+ assert.equal(response.status,200);assert.equal(await response.text(),'static team page');assert.equal(served,'/equipo/');assert.equal(response.headers.get('location'),null);
 });
 test('Registration reports success only after private storage succeeds',async()=>{const mock=async url=>url.includes('siteverify')?Response.json({success:true,hostname:'la-comarca.github.io',action:'inscripcion'}):new Response('{}',{status:201});assert.equal((await handle(request(),env,mock)).status,201);const bad=async url=>url.includes('siteverify')?Response.json({success:true,hostname:'la-comarca.github.io',action:'inscripcion'}):new Response('{}',{status:500});assert.equal((await handle(request(),env,bad)).status,502);});
 test('dynamic event requests are linked only after checking source and publication',async()=>{
