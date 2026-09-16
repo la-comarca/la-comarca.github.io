@@ -6,6 +6,7 @@ import {publicAgenda,cachedAgenda} from './public-agenda.mjs';
 import {supabaseAuth} from './supabase-auth.mjs';
 import {backoffice} from './backoffice.mjs';
 import {catechismPlatform} from './catechism-platform.mjs';
+import {catechismOps} from './catechism-ops.mjs';
 import {catechismSetup} from './catechism-setup.mjs';
 import {teamAccess} from './team-access.mjs';
 import {catechistOnboarding} from './catechist-onboarding.mjs';
@@ -31,6 +32,7 @@ export async function handle(request,env,fetcher=fetch){
  if(path==='/backoffice/setup'||path.startsWith('/backoffice/setup/'))return catechismSetup(request,env);
  if(path==='/backoffice/v2/access'||path.startsWith('/backoffice/v2/access/'))return teamAccess(request,env);
  if(path==='/backoffice/v2/catechists'&&request.method==='POST')return catechistOnboarding(request,env);
+ if(path.startsWith('/backoffice/ops/'))return catechismOps(request,env);
  if(path.startsWith('/backoffice/v2/'))return catechismPlatform(request,env);
  if(path.startsWith('/backoffice/api/'))return backoffice(request,env,fetcher);
  if(path==='/cms'||path.startsWith('/cms/')||path==='/equipo/activar')return cms(request,env,fetcher);
