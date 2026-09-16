@@ -1,4 +1,4 @@
-const defaultEndpoint='https://la-comarca-formularios.la-comarca.workers.dev/calendario.ics';
+const defaultEndpoint='https://comarca.kipadmon.com/calendario.ics';
 export function subscriptionURL({types=[],circles=[],allTypes=true,allCircles=true},endpoint=defaultEndpoint){
  const url=new URL(endpoint);if(!allTypes)for(const t of [...new Set(types)].sort())url.searchParams.append('type',t);
  if(!allCircles){url.searchParams.set('circles','selected');for(const id of [...new Set(circles)].sort())url.searchParams.append('circle',id);}
