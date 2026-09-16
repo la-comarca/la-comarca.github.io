@@ -7,6 +7,7 @@ import {supabaseAuth} from './supabase-auth.mjs';
 import {backoffice} from './backoffice.mjs';
 import {catechismPlatform} from './catechism-platform.mjs';
 import {catechismSetup} from './catechism-setup.mjs';
+import {teamAccess} from './team-access.mjs';
 export const activities=['Retiro mensual · 1 octubre 2026','Retiro semestral · 16–18 octubre 2026','Círculos','Catecismo','Despensas y visitas','Hikes y caminatas','Labor social','Aportaciones y donaciones','Proponer una actividad','Otras actividades'];
 export function validate(input){
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('Revisa los datos del formulario.');
@@ -27,6 +28,7 @@ export async function handle(request,env,fetcher=fetch){
  if(path==='/public/materials')return publicMaterials(request,env,fetcher,typeof caches==='undefined'?undefined:caches.default);
  if(path==='/auth'||path.startsWith('/auth/'))return supabaseAuth(request,env);
  if(path==='/backoffice/setup'||path.startsWith('/backoffice/setup/'))return catechismSetup(request,env);
+ if(path==='/backoffice/v2/access'||path.startsWith('/backoffice/v2/access/'))return teamAccess(request,env);
  if(path.startsWith('/backoffice/v2/'))return catechismPlatform(request,env);
  if(path.startsWith('/backoffice/api/'))return backoffice(request,env,fetcher);
  if(path==='/cms'||path.startsWith('/cms/')||path==='/equipo/activar')return cms(request,env,fetcher);

@@ -25,11 +25,15 @@ test('Catecismo setup preflight exposes only required methods and headers',async
  assert.match(response.headers.get('Access-Control-Allow-Methods')||'',/PATCH/);
 });
 
-test('back-office shell follows public header pattern and loads configuration editor',()=>{
+test('back-office shell follows public header pattern and loads configuration and access tools',()=>{
  const html=backofficeHTML('/', 'abc123');
  assert.match(html,/class="header bo-site-header"/);
- assert.match(html,/class="brand"[^>]*>LC<span class="brand-dot">\.<\/span>/);
+ assert.match(html,/class="brand bo-brand-lockup"/);
+ assert.match(html,/src="\/assets\/favicon\.svg"/);
+ assert.match(html,/class="bo-brand-word">LC<span class="brand-dot">\.<\/span>/);
  assert.match(html,/>Configuración<\/button>/);
- assert.match(html,/backoffice-setup\.js\?v=abc123/);
- assert.match(html,/backoffice-menu\.css\?v=abc123/);
+ assert.match(html,/data-access-open/);
+ assert.match(html,/backoffice-setup\.js\?v=abc123-access1/);
+ assert.match(html,/backoffice-access\.js\?v=abc123-access1/);
+ assert.match(html,/backoffice-menu\.css\?v=abc123-access1/);
 });
