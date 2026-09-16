@@ -1,0 +1,12 @@
+const feature=document.querySelector('.home-feature');
+if(feature){
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const fmt=s=>new Intl.DateTimeFormat('es-MX',{dateStyle:'long',timeZone:'America/Mexico_City'}).format(new Date(s.length===10?s+'T12:00:00-06:00':s));
+ const weekly=e=>String(e.recurrence||'').toLowerCase().includes('semanal');
+ const configResponse=await fetch(new URL('./config.json',import.meta.url),{cache:'no-store'}),config=configResponse.ok?await configResponse.json():{basePath:'/'};
+ let events=[];
+ try{const live=await fetch(new URL('/public/agenda',config.platformOrigin||location.origin));if(live.ok){const d=await live.json();events=Array.isArray(d.events)?d.events:[];}}catch{}
+ if(!events.length){const fallback=await fetch(new URL('./data.json',import.meta.url),{cache:'no-store'});if(fallback.ok){const d=await fallback.json();events=Array.isArray(d.events)?d.events:[];}}
+ const upcoming=events.filter(e=>e&&e.status!=='Cancelada'&&!weekly(e)).sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,4),base=config.basePath||'/';
+ feature.innerHTML=`<div class="home-announcements-head"><div><span class="eyebrow">LO QUE VIENE</span><h2>Próximos<br>encuentros.</h2></div><p>Actividades especiales y encuentros con fecha propia. Los horarios semanales siguen disponibles en la agenda.</p></div><div class="home-announcements-grid">${upcoming.length?upcoming.map((e,i)=>`<a class="home-announcement ${e.image?'has-poster':''}" href="${base}agenda/?evento=${encodeURIComponent(e.id)}"><div class="home-announcement-copy"><small>${esc(e.type||'Encuentro')} · ${String(i+1).padStart(2,'0')}</small><h3>${esc(e.title)}</h3><p>${esc(fmt(e.start))}${e.location?' · '+esc(e.location):''}</p><span>Ver detalles ↗</span></div>${e.image?`<figure><img src="${esc(e.image)}" alt="Cartel de ${esc(e.title)}" loading="lazy" decoding="async"></figure>`:`<div class="home-announcement-date"><strong>${esc(new Intl.DateTimeFormat('es-MX',{day:'2-digit'}).format(new Date(e.start)))}</strong><span>${esc(new Intl.DateTimeFormat('es-MX',{month:'short'}).format(new Date(e.start)))}</span></div>`}</a>`).join(''):`<div class="home-announcements-empty"><p>No hay encuentros especiales publicados por ahora.</p><a href="${base}agenda/">Consultar la agenda ↗</a></div>`}</div><div class="home-announcements-foot"><a class="text-link" href="${base}agenda/">Ver agenda completa <span>↗</span></a></div>`;
+}
