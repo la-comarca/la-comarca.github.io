@@ -1,70 +1,10 @@
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
 export function backofficeHTML(basePath,version){
  const base=esc(basePath),v=esc(version);
- const nav=[
-  ['resumen','Resumen'],
-  ['students','Alumnos'],
-  ['attendance','Pase de lista'],
-  ['lessons','Clases'],
-  ['grades','Calificaciones'],
-  ['topics','Temas'],
-  ['shifts','Catequistas']
- ];
- return `<!doctype html>
-<html lang="es-MX">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#133b58">
-<title>Catecismo · Equipo · La Comarca</title>
-<link rel="icon" href="${base}assets/icon-192.png">
-<link rel="stylesheet" href="${base}styles.css?v=${v}">
-<link rel="stylesheet" href="${base}backoffice.css?v=${v}">
-</head>
-<body class="bo-body">
-<a class="skip" href="#bo-content">Saltar al contenido</a>
-<div class="bo-shell" data-backoffice>
- <header class="bo-appbar">
-  <div class="bo-app-identity">
-   <a class="bo-brand" href="${base}">La Comarca<span>.</span></a>
-   <span class="bo-app-switcher" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
-   <div class="bo-app-name"><small>EQUIPO</small><strong>Catecismo</strong></div>
-  </div>
-  <nav class="bo-appmenu" aria-label="Catecismo">
-   ${nav.map(([key,label],index)=>`<button type="button" data-bo-view="${key}"${index===0?' class="active" aria-current="page"':''}>${label}</button>`).join('')}
-  </nav>
-  <div class="bo-account-wrap">
-   <details class="bo-user-menu"><summary class="bo-account" data-bo-account aria-label="Cuenta"><span class="bo-account-avatar" aria-hidden="true">LC</span><span class="bo-account-copy"><strong>Cargando…</strong><small>Equipo</small></span></summary><div class="bo-user-menu-panel"><a href="${base}">Ir al sitio público</a><button type="button" data-bo-logout>Cerrar sesión</button></div></details>
-   <button class="bo-icon-button bo-mobile-menu" type="button" data-bo-menu aria-expanded="false" aria-controls="bo-mobile-nav" aria-label="Abrir menú">☰</button>
-  </div>
- </header>
- <nav class="bo-mobile-nav" id="bo-mobile-nav" hidden>
-  ${nav.map(([key,label])=>`<button type="button" data-bo-view="${key}">${label}</button>`).join('')}
-  <a href="${base}agenda/">Sitio público</a>
-  <button type="button" data-bo-logout>Cerrar sesión</button>
- </nav>
- <header class="bo-controlbar">
-  <div class="bo-control-heading">
-   <button class="bo-back" type="button" data-bo-back hidden aria-label="Volver">←</button>
-   <div><span class="bo-breadcrumb" data-bo-breadcrumb>CATÉCISMO</span><h1 data-bo-title>Resumen</h1></div>
-  </div>
-  <div class="bo-control-actions" data-bo-control-actions></div>
- </header>
- <section class="bo-search-command" data-bo-toolbar hidden></section>
- <main class="bo-main" id="bo-content">
-  <section class="bo-content" data-bo-content aria-live="polite">
-   <div class="bo-loading"><span></span><p>Preparando Catecismo…</p></div>
-  </section>
- </main>
-</div>
-<dialog class="bo-related-dialog" data-bo-related aria-labelledby="bo-related-title">
- <header><div><span class="bo-kicker">RELACIONADOS</span><h2 id="bo-related-title" data-bo-related-title>Registros</h2></div><button type="button" data-bo-related-close aria-label="Cerrar">×</button></header>
- <div data-bo-related-body></div>
-</dialog>
-<div class="bo-toast" data-bo-toast role="status" aria-live="polite" hidden></div>
-<script type="module" src="${base}backoffice.js?v=${v}"></script>
-</body>
-</html>`;
+ return `<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#133b58"><title>Catecismo · La Comarca</title><link rel="icon" href="${base}assets/icon-192.png"><link rel="stylesheet" href="${base}styles.css?v=${v}"><link rel="stylesheet" href="${base}backoffice.css?v=${v}"></head><body class="bo-body"><a class="skip" href="#bo-content">Saltar al contenido</a><div class="bo-shell" data-backoffice>
+<header class="bo-desktop-bar"><a class="bo-wordmark" href="${base}">La Comarca<span>.</span></a><div class="bo-module-name"><small>EQUIPO</small><strong>Catecismo</strong></div><nav class="bo-desktop-nav" aria-label="Catecismo"><button data-view="today" class="active">Hoy</button><button data-view="calendar">Calendario</button><button data-view="groups">Grupos</button><button data-view="students">Alumnos</button><button data-view="catechists">Catequistas</button><button data-view="more">Más</button></nav><details class="bo-account-menu"><summary data-account>Cuenta</summary><div><a href="${base}">Sitio público</a><button type="button" data-logout>Cerrar sesión</button></div></details></header>
+<header class="bo-mobile-top"><div><span class="bo-mobile-kicker">LA COMARCA</span><strong data-mobile-title>Hoy</strong></div><button type="button" class="bo-avatar" data-mobile-account aria-label="Cuenta">LC</button></header>
+<main class="bo-main" id="bo-content"><div class="bo-page-head"><div><span class="bo-eyebrow" data-eyebrow>CATECISMO</span><h1 data-title>Hoy</h1></div><div class="bo-page-actions" data-actions></div></div><section class="bo-content" data-content aria-live="polite"><div class="bo-loading"><span></span><p>Preparando Catecismo…</p></div></section></main>
+<nav class="bo-bottom-nav" aria-label="Navegación principal"><button data-view="today" class="active"><span aria-hidden="true">⌂</span><small>Hoy</small></button><button data-view="calendar"><span aria-hidden="true">□</span><small>Calendario</small></button><button data-view="groups"><span aria-hidden="true">▦</span><small>Grupos</small></button><button data-view="students"><span aria-hidden="true">◎</span><small>Alumnos</small></button><button data-view="more"><span aria-hidden="true">•••</span><small>Más</small></button></nav>
+</div><dialog class="bo-sheet" data-sheet><form method="dialog" class="bo-sheet-card" data-sheet-form><header><div><span class="bo-eyebrow" data-sheet-kicker>CATECISMO</span><h2 data-sheet-title>Nuevo</h2></div><button type="button" data-sheet-close aria-label="Cerrar">×</button></header><div class="bo-sheet-body" data-sheet-body></div><p class="bo-sheet-status" data-sheet-status role="status"></p><footer><button type="button" class="bo-button ghost" data-sheet-cancel>Cancelar</button><button type="submit" class="bo-button primary" data-sheet-save>Guardar</button></footer></form></dialog><div class="bo-toast" data-toast hidden role="status"></div><script type="module" src="${base}backoffice.js?v=${v}"></script></body></html>`;
 }

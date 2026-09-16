@@ -4,44 +4,17 @@
   "main": "worker.mjs",
   "account_id": "0b4dd54f3b1974a7036afdf876164aa2",
   "compatibility_date": "2026-09-13",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
-  "routes": [
-    {
-      "pattern": "comarca.kipadmon.com",
-      "custom_domain": true
-    }
-  ],
+  "routes": [{"pattern":"comarca.kipadmon.com","custom_domain":true}],
   "assets": {
     "directory": "../dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
-    "run_worker_first": [
-      "/auth",
-      "/auth/*",
-      "/backoffice/api/*",
-      "/cms",
-      "/cms/*",
-      "/equipo/activar",
-      "/public/*",
-      "/calendario.ics",
-      "/solicitudes"
-    ]
+    "run_worker_first": ["/auth","/auth/*","/backoffice/api/*","/backoffice/v2/*","/cms","/cms/*","/equipo/activar","/public/*","/calendario.ics","/solicitudes"]
   },
-  "observability": {
-    "enabled": true,
-    "logs": {
-      "enabled": true,
-      "head_sampling_rate": 1
-    },
-    "traces": {
-      "enabled": true,
-      "head_sampling_rate": 0.1
-    }
-  },
+  "observability": {"enabled":true,"logs":{"enabled":true,"head_sampling_rate":1},"traces":{"enabled":true,"head_sampling_rate":0.1}},
   "vars": {
     "CMS_ORIGIN": "https://comarca.kipadmon.com",
     "SUPABASE_URL": "https://towouvaslpawbdzvksjo.supabase.co",
@@ -53,22 +26,6 @@
     "NOTION_DATA_SOURCE_ID": "3d479aad-5d83-8055-a2d6-000b045a7d89",
     "CMS_AGENDA_EDIT_ENABLED": "true"
   },
-  "d1_databases": [
-    {
-      "binding": "CMS_DB",
-      "database_name": "la-comarca-cms",
-      "database_id": "eda9a03b-1ff4-479c-b45a-5a3e5bc52aa8",
-      "migrations_dir": "migrations"
-    }
-  ],
-  "ratelimits": [
-    {
-      "name": "FORM_LIMIT",
-      "namespace_id": "1047",
-      "simple": {
-        "limit": 8,
-        "period": 60
-      }
-    }
-  ]
+  "d1_databases": [{"binding":"CMS_DB","database_name":"la-comarca-cms","database_id":"eda9a03b-1ff4-479c-b45a-5a3e5bc52aa8","migrations_dir":"migrations"}],
+  "ratelimits": [{"name":"FORM_LIMIT","namespace_id":"1047","simple":{"limit":8,"period":60}}]
 }
