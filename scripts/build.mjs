@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-import {cp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
+import {cp,mkdir,readFile,writeFile,rm,readdir} from 'node:fs/promises';
 import {calendar} from '../public/calendar.js';
 const basePath=process.env.BASE_PATH||'/comarca/';if(!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(basePath))throw Error('BASE_PATH inválido');
 const oneSignalAppId=process.env.ONESIGNAL_APP_ID||'';if(oneSignalAppId&&!/^[a-f0-9-]{36}$/i.test(oneSignalAppId))throw Error('ONESIGNAL_APP_ID inválido');
@@ -10,9 +10,8 @@ if(!/^https:\/\/[^\s/]+$/.test(platformOrigin))throw Error('PLATFORM_ORIGIN inv�
 const data=JSON.parse(await readFile('public/data.json','utf8'));if(!Array.isArray(data.events)||!Array.isArray(data.resources))throw Error('Datos inválidos');
 await rm('dist',{recursive:true,force:true});await mkdir('dist',{recursive:true});await cp('public','dist',{recursive:true});
 
-// Keep the legacy stylesheet untouched while a small final layer restores the shared
-// public visual system. Appending it guarantees that generated pages and the homepage
-// receive the same cascade without duplicating the full stylesheet.
+// Append a small editorial alignment layer after the legacy stylesheet so repaired
+// pages inherit the same public visual system without duplicating the whole CSS file.
 const editorialCSS=await readFile('public/editorial-fix.css','utf8');
 const baseCSS=await readFile('dist/styles.css','utf8');
 await writeFile('dist/styles.css',`${baseCSS}\n\n${editorialCSS}\n`);
@@ -28,13 +27,18 @@ let app=await readFile('dist/app.js','utf8');app=app.replace("'./calendar.js'",`
 const {buildPages}=await import('./pages.mjs');
 await buildPages(data,basePath,version,platformOrigin);
 
-// GitHub Pages is static. Do not present a form that appears to authenticate on the
-// static origin. The public Team page remains in the same editorial shell and hands
-// the user to the existing private server where authentication is actually enforced.
+// GitHub Pages is static. The public route is a proper sign-in entry in the same
+// visual shell; credentials are collected only by the real private backend.
 const teamPath='dist/equipo/index.html',cmsURL=platformOrigin.replace(/\/$/,'')+'/cms/';
 let teamHTML=await readFile(teamPath,'utf8');
-teamHTML=teamHTML.replace('Inicia sesión para continuar.','Organización, agenda y seguimiento para quienes coordinan La Comarca.');
-teamHTML=teamHTML.replace(/<section class="section team-login-section">[\s\S]*?<\/section>/,`<section class="section team-gateway"><div><div class="team-gateway-copy"><span class="eyebrow">ESPACIO PRIVADO</span><h2>Lo público aquí.<br>La gestión, aparte.</h2><p>El portal público informa y acompaña. La organización interna —personas, asistencia, materiales y seguimiento— permanece en el panel privado, con autenticación y permisos del servidor.</p><a class="button team-gateway-button" href="${cmsURL}">Entrar al panel privado <span aria-hidden="true">↗</span></a></div><div class="team-gateway-notes"><div class="team-gateway-note"><small>01 · Privado</small><p>Los datos internos no se publican en GitHub Pages.</p></div><div class="team-gateway-note"><small>02 · Seguro</small><p>El acceso se decide en el servidor, no por botones ocultos.</p></div><div class="team-gateway-note"><small>03 · Claro</small><p>Si no tienes cuenta, pide una invitación al administrador.</p></div></div></div><aside class="team-gateway-aside"><span class="eyebrow">EQUIPO</span><p>Un solo lugar para coordinar.</p><small>Agenda, operación y seguimiento continúan en el panel privado existente.</small></aside></section>`);
+teamHTML=teamHTML.replace(/<section class="page-intro[^"]*">[\s\S]*?<\/section>/,`<section class="page-intro login-intro"><span class="eyebrow">BACK OFFICE</span><h1 class="page-title"><span class="word-mask"><span>Iniciar<br>sesión.</span></span></h1><p>Acceso privado para quienes coordinan La Comarca. La autenticación y los permisos se gestionan en el servidor seguro.</p></section>`);
+teamHTML=teamHTML.replace(/<section class="section team-login-section">[\s\S]*?<\/section>/,`<section class="section login-page"><div class="login-shell"><div class="login-copy"><span class="eyebrow">ACCESO DEL EQUIPO</span><h2>Tu espacio de trabajo,<br>en un solo lugar.</h2><p>Entra al back office para organizar agenda, personas, asistencia, materiales y seguimiento. El sitio público permanece separado de la información interna.</p><p class="login-help">¿Es tu primera vez? Pide una invitación al administrador antes de intentar entrar.</p></div><div class="login-panel"><div class="login-mark" aria-hidden="true">↗</div><h3>Back office de La Comarca</h3><p>Continuarás al acceso seguro, donde podrás introducir tu correo y contraseña.</p><a class="button login-button" href="${cmsURL}">Iniciar sesión <span aria-hidden="true">↗</span></a></div></div></section>`);
+teamHTML=teamHTML.replaceAll('Acceso del equipo','Iniciar sesión');
 await writeFile(teamPath,teamHTML);
+
+// Keep the public navigation language consistent: this route is a sign-in action,
+// not a separate public section called “Equipo”.
+async function htmlFiles(dir){const out=[];for(const entry of await readdir(dir,{withFileTypes:true})){const path=`${dir}/${entry.name}`;if(entry.isDirectory())out.push(...await htmlFiles(path));else if(entry.name.endsWith('.html'))out.push(path);}return out;}
+for(const path of await htmlFiles('dist')){let page=await readFile(path,'utf8');const next=page.replaceAll('Acceso del equipo','Iniciar sesión');if(next!==page)await writeFile(path,next);}
 
 await import('./check-site.mjs');
