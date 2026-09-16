@@ -35,6 +35,37 @@ async function summary(env,fetcher){
  return Object.fromEntries(rows);
 }
 
+function filterCondition(definition,raw){
+ const split=raw.indexOf(':');if(split<1)throw new RecordError('Filtro no válido.');
+ const name=raw.slice(0,split),value=raw.slice(split+1),field=definition.fields.find(item=>item.name===name);
+ if(!field||value.length>150)throw new RecordError('Filtro no válido.');
+ if(field.type==='select'){
+  if(!field.options?.includes(value))throw new RecordError('Filtro no válido.');
+  return {property:name,select:{equals:value}};
+ }
+ if(field.type==='checkbox'){
+  if(!['true','false'].includes(value))throw new RecordError('Filtro no válido.');
+  return {property:name,checkbox:{equals:value==='true'}};
+ }
+ throw new RecordError('Este campo no se puede usar como filtro.');
+}
+
+async function listRecords(env,user,key,url,fetcher){
+ const definition=modules[key];if(!definition||!CATECHISM_SET.has(key)||!can(user,'catecismo'))throw new RecordError('Sección no disponible.',404);
+ if(!enabled(key,env))throw new RecordError('Esta sección todavía no está conectada.',503);
+ const q=url.searchParams.get('q')||'';if(q.length>150)throw new RecordError('Consulta no válida.');
+ const cursor=url.searchParams.get('cursor');if(cursor&&!UUID.test(cursor))throw new RecordError('Consulta no válida.');
+ const rawFilters=url.searchParams.getAll('filter');if(rawFilters.length>5)throw new RecordError('Demasiados filtros.');
+ const conditions=[];if(q){const title=titleField(key);conditions.push({property:title.name,title:{contains:q}});}for(const raw of rawFilters)conditions.push(filterCondition(definition,raw));
+ let filter;if(conditions.length===1)filter=conditions[0];else if(conditions.length>1)filter={and:conditions};
+ const sort=url.searchParams.get('sort')||'',direction=url.searchParams.get('direction')||'ascending';
+ if(!['ascending','descending'].includes(direction))throw new RecordError('Orden no válido.');
+ let sorts=[{timestamp:'last_edited_time',direction:'descending'}];
+ if(sort){const field=definition.fields.find(item=>item.name===sort);if(!field||!['title','select','number','date','text'].includes(field.type))throw new RecordError('Orden no válido.');sorts=[{property:sort,direction}];}
+ const data=await querySource(env,key,{page_size:50,...(cursor?{start_cursor:cursor}:{}),...(filter?{filter}:{}),sorts},fetcher);
+ return {records:data.results.map(page=>recordValues(page,definition)),nextCursor:data.has_more?data.next_cursor:null};
+}
+
 async function lookup(env,user,key,url,fetcher){
  const allowed=CATECHISM_SET.has(key)||key==='agenda'||key==='materials';
  if(!allowed)throw new RecordError('Consulta no disponible.',404);
@@ -48,6 +79,20 @@ async function lookup(env,user,key,url,fetcher){
  if(!enabled(key,env))throw new RecordError('Esta sección todavía no está conectada.',503);
  const field=titleField(key),data=await querySource(env,key,{page_size:50,...(cursor?{start_cursor:cursor}:{}),...(q?{filter:{property:field.name,title:{contains:q}}}:{})},fetcher);
  return {options:data.results.map(page=>({id:page.id,label:itemTitle(key,page)})),nextCursor:data.has_more?data.next_cursor:null};
+}
+
+async function relatedRecords(env,user,key,id,fetcher){
+ const definition=modules[key];if(!definition||!CATECHISM_SET.has(key)||!UUID.test(id))throw new RecordError('Registro no disponible.',404);
+ const parent=await notion(env,'pages/'+id,{},fetcher);if(!belongs(parent,definition.id))throw new RecordError('Registro no disponible.',404);
+ const groups=[];
+ for(const childKey of CATECHISM_KEYS){
+  if(childKey===key||!enabled(childKey,env))continue;
+  const child=modules[childKey],relations=child.fields.filter(field=>field.type==='relation'&&field.target===key);if(!relations.length)continue;
+  const filter=relations.length===1?{property:relations[0].name,relation:{contains:id}}:{or:relations.map(field=>({property:field.name,relation:{contains:id}}))};
+  const data=await querySource(env,childKey,{page_size:20,filter,sorts:[{timestamp:'last_edited_time',direction:'descending'}]},fetcher);
+  groups.push({key:childKey,label:child.label,count:data.results.length,hasMore:!!data.has_more,records:data.results.slice(0,10).map(page=>({id:page.id,label:itemTitle(childKey,page),version:page.last_edited_time}))});
+ }
+ return {related:groups};
 }
 
 async function sessions(env,fetcher){
@@ -104,7 +149,7 @@ export async function backoffice(request,env,fetcher=fetch,dependencies={}){
  const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
  try{
   if(path==='/backoffice/api/me'&&request.method==='GET')return reply(origin,200,{user:{name:me.name,email:me.email,role:(me.modules||[]).find(m=>m.key==='catecismo')?.role||'reader'},module:'catecismo'});
-  if(path==='/backoffice/api/schema'&&request.method==='GET')return reply(origin,200,{modules:CATECHISM_KEYS.map(key=>({key,label:modules[key].label,canWrite:can(user,'catecismo',true),fields:modules[key].fields.filter(field=>field.name!=='Necesita ride')}))});
+  if(path==='/backoffice/api/schema'&&request.method==='GET')return reply(origin,200,{modules:CATECHISM_KEYS.map(key=>({key,label:modules[key].label,canWrite:can(user,'catecismo',true),fields:modules[key].fields.filter(field=>field.name!=='Necesita ride').map(field=>({...field,readOnly:!!field.readOnly||!!field.target&&!can(user,modulePermission(field.target))}))}))});
   if(path==='/backoffice/api/summary'&&request.method==='GET')return reply(origin,200,{summary:await summary(env,fetcher)});
   if(path==='/backoffice/api/sessions'&&request.method==='GET')return reply(origin,200,await sessions(env,fetcher));
   if(path==='/backoffice/api/attendance'&&request.method==='GET')return reply(origin,200,await attendanceSheet(env,user,url.searchParams.get('session'),fetcher));
@@ -113,11 +158,13 @@ export async function backoffice(request,env,fetcher=fetch,dependencies={}){
    if(!env.FORM_LIMIT||!(await env.FORM_LIMIT.limit({key:'backoffice:'+me.id})).success)throw new RecordError('Espera un momento antes de guardar otra vez.',429);
    return reply(origin,200,await saveAttendance(env,user,await jsonBody(request),fetcher));
   }
+  const relatedRoute=path.match(/^\/backoffice\/api\/related\/([a-z]+)\/([a-f0-9-]{36})$/i);if(relatedRoute&&request.method==='GET')return reply(origin,200,await relatedRecords(env,user,relatedRoute[1],relatedRoute[2],fetcher));
   const lookupRoute=path.match(/^\/backoffice\/api\/lookup\/([a-z]+)$/);if(lookupRoute&&request.method==='GET')return reply(origin,200,await lookup(env,user,lookupRoute[1],url,fetcher));
   const recordRoute=path.match(/^\/backoffice\/api\/records\/([a-z]+)(?:\/([a-f0-9-]{36}))?$/i);
   if(recordRoute){
    const key=recordRoute[1],id=recordRoute[2];if(!CATECHISM_SET.has(key))throw new RecordError('Sección no disponible.',404);
    if(!['GET','POST','PATCH'].includes(request.method))throw new RecordError('Método no permitido.',405);
+   if(request.method==='GET'&&!id)return reply(origin,200,await listRecords(env,user,key,url,fetcher));
    let input=null;if(request.method!=='GET'){
     if(!request.headers.get('Content-Type')?.startsWith('application/json'))throw new RecordError('Formato no válido.',415);
     if(!env.FORM_LIMIT||!(await env.FORM_LIMIT.limit({key:'backoffice:'+me.id})).success)throw new RecordError('Espera un momento antes de guardar otra vez.',429);
