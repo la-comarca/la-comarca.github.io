@@ -25,6 +25,13 @@ test('assigned catechist can save attendance only for own group roster',async()=
  assert.equal(response.status,200);assert.equal((await response.json()).saved,1);assert.equal(writes[0][0].status,'present');assert.equal(writes[0][0].updated_by,ids.profile);
 });
 
+test('reader cannot save attendance',async()=>{
+ const identity=async()=>({id:'reader-user',modules:[{key:'catecismo',role:'reader'}]});
+ const db=async()=>{throw Error('reader should be rejected before database mutation');};
+ const response=await catechismOps(request(`/backoffice/ops/sessions/${ids.session}/attendance`,{method:'PATCH',body:JSON.stringify({records:[{enrollment_id:ids.enrollment,status:'present'}]})}),env,{db,identity});
+ assert.equal(response.status,403);
+});
+
 test('attendance rejects unsupported status',async()=>{
  const db=async(_env,path)=>{
   if(path.startsWith('rest/v1/profiles?'))return [{id:ids.profile}];
