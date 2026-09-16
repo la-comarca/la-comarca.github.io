@@ -29,7 +29,7 @@ export function backofficeHTML(basePath,version){
  <header class="bo-appbar">
   <div class="bo-app-identity">
    <a class="bo-brand" href="${base}">La Comarca<span>.</span></a>
-   <button class="bo-app-switcher" type="button" aria-label="Aplicaciones" title="Aplicaciones"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></button>
+   <span class="bo-app-switcher" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
    <div class="bo-app-name"><small>EQUIPO</small><strong>Catecismo</strong></div>
   </div>
   <nav class="bo-appmenu" aria-label="Catecismo">
