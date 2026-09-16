@@ -18,8 +18,8 @@ async function authFetch(env,path,{method='GET',body:payload,token}={}){
 
 async function provisionFirstAdministrator(env,user,email){
  const existing=await supabaseRequest(env,'rest/v1/workspace_memberships?active=eq.true&select=user_id&limit=1');
- if(existing.length) return null;
- const created=await supabaseRequest(env,'rest/v1/profiles',{method:'POST',body:{email,auth_user_id:user.id,display_name:user.user_metadata?.display_name||''}});
+ if(existing.length)return null;
+ const created=await supabaseRequest(env,'rest/v1/profiles',{method:'POST',body:{id:user.id,email,auth_user_id:user.id,display_name:user.user_metadata?.display_name||''}});
  const profile=created?.[0];
  if(!profile?.id)throw Error('permission');
  const workspaces=await supabaseRequest(env,'rest/v1/workspaces?active=eq.true&select=id,key,name,description,active');
