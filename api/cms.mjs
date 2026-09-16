@@ -14,7 +14,7 @@ export function invitationInput(v){if(typeof v.email!=='string'||v.email.length>
 
 export async function cms(request,env,fetcher=fetch,dependencies={}) {
  const path=new URL(request.url).pathname.replace(/\/$/,''),method=request.method;
- if(method==='GET'&&(path==='/cms'||path==='/equipo/activar'))return reply(cmsHTML,200,'text/html');
+ if(method==='GET'&&(path==='/cms'||path==='/equipo/activar'))return reply(cmsHTML.replaceAll('Equipo · La Comarca','La Comarca Formularios').replaceAll('LA COMARCA / EQUIPO','LA COMARCA / FORMULARIOS'),200,'text/html');
  if(method==='GET'&&path==='/cms/app.js')return reply(cmsJS,200,'text/javascript');
  if(!env.CMS_DB||!env.CMS_AUTH_SECRET)return reply({message:'El acceso propio está terminando de configurarse.'},503);
  try {

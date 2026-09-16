@@ -4,7 +4,7 @@ import {syncSupabaseAccess} from './supabase.mjs';
 export function authOptions(env) {
  const fallback='https://la-comarca-formularios.la-comarca.workers.dev',canonical=env.CMS_ORIGIN||fallback;
  return {
-  appName:'La Comarca',baseURL:canonical,basePath:'/cms/auth',
+  appName:'La Comarca Formularios',baseURL:canonical,basePath:'/cms/auth',
   secret:env.CMS_AUTH_SECRET,database:env.CMS_DB,
   trustedOrigins:[...new Set([canonical,fallback])],
   emailAndPassword:{enabled:true,minPasswordLength:12,maxPasswordLength:128,autoSignIn:false},
