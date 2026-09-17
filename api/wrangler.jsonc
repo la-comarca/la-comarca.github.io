@@ -12,7 +12,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
-    "run_worker_first": ["/auth","/auth/*","/backoffice/api/*","/backoffice/v2/*","/backoffice/ops/*","/backoffice/hub/*","/backoffice/setup","/backoffice/setup/*","/cms","/cms/*","/equipo/activar","/public/*","/calendario.ics","/solicitudes"]
+    "run_worker_first": ["/auth","/auth/*","/backoffice/api/*","/backoffice/v2/*","/backoffice/ops/*","/backoffice/hub/*","/backoffice/documents/*","/backoffice/setup","/backoffice/setup/*","/cms","/cms/*","/equipo/activar","/public/*","/calendario.ics","/solicitudes"]
   },
   "observability": {"enabled":true,"logs":{"enabled":true,"head_sampling_rate":1},"traces":{"enabled":true,"head_sampling_rate":0.1}},
   "vars": {
